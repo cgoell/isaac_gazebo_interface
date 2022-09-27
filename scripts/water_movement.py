@@ -2,12 +2,19 @@
 
 #This program simulates the movement of a boat in moderate wave conditions
 #Limited in pitch and roll to +- 10 deg (+-0.17 rad)
+#Spawn boats at random between x=[-4000,4000] and y=[-1000,-4000]
 
 MAX_ROLLANGLE = 0.02
 MAX_PITCHANGLE = 0.08
 
+UPPER_X = 4000
+UPPER_Y = -1000
+LOWER_X = -4000
+LOWER_Y = -4000
+
 import rospy
 import numpy as np
+import random as rd
 from geometry_msgs.msg import Pose
 from gazebo_msgs.msg import ModelState
 
@@ -50,8 +57,8 @@ def talker():
         #shipstate.pose.position.z = 0
 
         for i in range(7):
-            shipstate.pose.position.x = 955
-            shipstate.pose.position.y = -882 - 10 * i
+            shipstate.pose.position.x = ship_pos[2*i]
+            shipstate.pose.position.y = ship_pos[(2*i)+1]
             shipstate.pose.position.z = 0
             shipstate.model_name = ship_names[i]
             pub.publish(shipstate)
@@ -66,13 +73,19 @@ def get_quaternion_from_euler(roll, pitch, yaw):
      return [qx, qy, qz, qw]
 
 
-
 ship_names = ['vessel_a', 'vessel_b', 'vessel_c', 'vessel_d', 'vessel_e', 'vessel_f', 'vessel_g']
+ship_pos = [rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y), rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y),
+            rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y), rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y),
+            rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y), rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y),
+            rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y), rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y),
+            rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y), rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y),
+            rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y), rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y),
+            rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y), rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y)]
+
+
 rollangle = 0.00
 pitchangle = 0.05
 yawangle = 0.00
-
-
 shippose = Pose()
 shipstate = ModelState()
 
