@@ -66,10 +66,11 @@ def get_quaternion_from_euler(roll, pitch, yaw):
      qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
      qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
      qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
-     return [qx, qy, qz, qw]
+     return [qw, qx, qy, qz]
 
-def move(): 
-    vtol_prim.set_world_pose(position=np.array([vdrone_pose.position.x, vdrone_pose.position.y, vdrone_pose.position.z]),orientation=get_quaternion_from_euler(vdrone_pose.orientation.x, vdrone_pose.orientation.y, vdrone_pose.orientation.z))
+def move():
+
+    vtol_prim.set_world_pose(position=np.array([vdrone_pose.position.x, vdrone_pose.position.y, vdrone_pose.position.z]),orientation=np.array([vdrone_pose.orientation.w, vdrone_pose.orientation.x, vdrone_pose.orientation.y, vdrone_pose.orientation.z]))
     va_prim.set_world_pose(position=np.array([va_pose.position.x, va_pose.position.y, va_pose.position.z]),orientation=get_quaternion_from_euler(va_pose.orientation.x, va_pose.orientation.y, va_pose.orientation.z))
     vb_prim.set_world_pose(position=np.array([vb_pose.position.x, vb_pose.position.y, vb_pose.position.z]),orientation=get_quaternion_from_euler(vb_pose.orientation.x, vb_pose.orientation.y, vb_pose.orientation.z))
     vc_prim.set_world_pose(position=np.array([vc_pose.position.x, vc_pose.position.y, vc_pose.position.z]),orientation=get_quaternion_from_euler(vc_pose.orientation.x, vc_pose.orientation.y, vc_pose.orientation.z))
@@ -91,7 +92,7 @@ vd_pose = Pose()
 ve_pose = Pose()
 vf_pose = Pose()
 vg_pose = Pose()
-vtol_prim = Robot("/standard_vtol","vtol")
+vtol_prim = Robot("/World/standard_vtol","vtol")
 va_prim = Robot("/vessel_a","va")
 vb_prim = Robot("/vessel_b","vb")
 vc_prim = Robot("/vessel_c","vc")
