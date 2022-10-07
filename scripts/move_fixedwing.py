@@ -44,31 +44,26 @@ while is_stage_loading():
 print("Loading Complete")
 
 def callback(data):
-    vdrone_pose.position = data.pose[3].position        #drone  
-    vdrone_pose.orientation = data.pose[3].orientation
-    va_pose.position = data.pose[4].position  
-    va_pose.orientation = data.pose[4].orientation
-    vb_pose.position = data.pose[5].position
-    vb_pose.orientation = data.pose[5].orientation
-    vc_pose.position = data.pose[6].position
-    vc_pose.orientation = data.pose[6].orientation
-    vd_pose.position = data.pose[7].position
-    vd_pose.orientation = data.pose[7].orientation
-    ve_pose.position = data.pose[8].position
-    ve_pose.orientation = data.pose[8].orientation
-    vf_pose.position = data.pose[9].position
-    vf_pose.orientation = data.pose[9].orientation
-    vg_pose.position = data.pose[10].position
-    vg_pose.orientation = data.pose[10].orientation
 
-def teleport_client(msg):
-    rospy.wait_for_service("teleport")
-    try:
-        teleport = rospy.ServiceProxy("teleport", IsaacPose)
-        teleport(msg)
-        return
-    except rospy.ServiceException as e:
-        print("Service call failed: %s" % e)
+    va_pose.position = data.pose[3].position  
+    va_pose.orientation = data.pose[3].orientation
+    vb_pose.position = data.pose[4].position
+    vb_pose.orientation = data.pose[4].orientation
+    vc_pose.position = data.pose[5].position
+    vc_pose.orientation = data.pose[5].orientation
+    vd_pose.position = data.pose[6].position
+    vd_pose.orientation = data.pose[6].orientation
+    ve_pose.position = data.pose[7].position
+    ve_pose.orientation = data.pose[7].orientation
+    vf_pose.position = data.pose[8].position
+    vf_pose.orientation = data.pose[8].orientation
+    vg_pose.position = data.pose[9].position
+    vg_pose.orientation = data.pose[9].orientation
+    vdrone_pose.position = data.pose[10].position        #drone UAV  
+    vdrone_pose.orientation = data.pose[10].orientation
+    vtol_pose.position = data.pose[11].position        #drone VTOL  
+    vtol_pose.orientation = data.pose[11].orientation
+
 
 def get_quaternion_from_euler(roll, pitch, yaw):
      qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
@@ -78,6 +73,7 @@ def get_quaternion_from_euler(roll, pitch, yaw):
      return [qw, qx, qy, qz]
 
 def move():
+    vtol_prim.set_world_pose(position=np.array([vtol_pose.position.x, vtol_pose.position.y, vtol_pose.position.z]),orientation=np.array([vtol_pose.orientation.w, vtol_pose.orientation.x, vtol_pose.orientation.y, vtol_pose.orientation.z]))
     vdrone_prim.set_world_pose(position=np.array([vdrone_pose.position.x, vdrone_pose.position.y, vdrone_pose.position.z]),orientation=np.array([vdrone_pose.orientation.w, vdrone_pose.orientation.x, vdrone_pose.orientation.y, vdrone_pose.orientation.z]))
     va_prim.set_world_pose(position=np.array([va_pose.position.x, va_pose.position.y, va_pose.position.z]),orientation=get_quaternion_from_euler(va_pose.orientation.x, va_pose.orientation.y, va_pose.orientation.z))
     vb_prim.set_world_pose(position=np.array([vb_pose.position.x, vb_pose.position.y, vb_pose.position.z]),orientation=get_quaternion_from_euler(vb_pose.orientation.x, vb_pose.orientation.y, vb_pose.orientation.z))
@@ -91,9 +87,9 @@ def listener():
     rospy.init_node('listener', anonymous = True)
     rospy.Subscriber("/gazebo/model_states", ModelStates, callback, queue_size = 10)
 
-
 teleport_msg = IsaacPoseRequest()
 vdrone_pose = Pose()
+vtol_pose = Pose()
 va_pose = Pose()
 vb_pose = Pose()
 vc_pose = Pose()
@@ -101,20 +97,19 @@ vd_pose = Pose()
 ve_pose = Pose()
 vf_pose = Pose()
 vg_pose = Pose()
-vdrone_prim = Robot("/World/hexa_x_tilt","uav")
-va_prim = Robot("/vessel_a","va")
-vb_prim = Robot("/vessel_b","vb")
-vc_prim = Robot("/vessel_c","vc")
-vd_prim = Robot("/vessel_d","vd")
-ve_prim = Robot("/vessel_e","ve")
-vf_prim = Robot("/vessel_f","vf")
-vg_prim = Robot("/vessel_g","vg")
+vtol_prim = Robot("/World/UAVs/standard_vtol","vtol")
+vdrone_prim = Robot("/World/UAVs/hexa_x_tilt","hexa")
+va_prim = Robot("/World/Vessels/vessel_a","va")
+vb_prim = Robot("/World/Vessels/vessel_b","vb")
+vc_prim = Robot("/World/Vessels/vessel_c","vc")
+vd_prim = Robot("/World/Vessels/vessel_d","vd")
+ve_prim = Robot("/World/Vessels/vessel_e","ve")
+vf_prim = Robot("/World/Vessels/vessel_f","vf")
+vg_prim = Robot("/World/Vessels/vessel_g","vg")
 listener()
-
 
 while simulation_app.is_running():
     simulation_app.update()
     move()
-    
-    
+
 simulation_app.close()
