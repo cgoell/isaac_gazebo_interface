@@ -31,8 +31,7 @@ import os
 from isaac_ros_messages.srv import IsaacPose
 from isaac_ros_messages.srv import IsaacPoseRequest
 from geometry_msgs.msg import Pose
-from geometry_msgs.msg import Quaternion
-from gazebo_msgs.msg import ModelStates
+
 
 
 pathtoworld = os.path.expanduser('~') + "/Desktop/Coastline_Maps/Coastline_Map_cam_only/Terrain/Terrain_Demo.usdc"
@@ -47,10 +46,9 @@ while is_stage_loading():
 print("Loading Complete")
 
 def callback_cam1(data):
-    data.pose.position.x
-    sl_detection_cam_prim.set_world_pose(position = np.array([data.pose.position.x, data.pose.position.y, data.pose.position.z]),
-                                         orientation = np.array([data.pose.orientation.w, data.pose.orientation.x, data.pose.orientation.y, data.pose.orientation.z]))
-
+    sl_detection_cam_prim.set_world_pose(position = np.array([data.position.x, data.position.y, data.position.z]), 
+                                         orientation = [data.orientation.w, data.orientation.x, data.orientation.y, data.orientation.z])
+    
 def listener():
     #Initializing Ros nodes and topics
     rospy.init_node('ISAAC_Gazebo', anonymous = True)
