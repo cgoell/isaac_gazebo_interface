@@ -163,10 +163,10 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-  scripts/ros_service_client.py
   scripts/water_movement.py
-  scripts/ros_teleport_fixed_traj.py
-  scripts/isaac_launch.py
+  scripts/Isaac_Gazebo_onevtol_flyaround.py
+  scripts/Isaac_Gazebo_onevtol.py
+  scripts/Isaac_Gazebo_allUAVs.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
