@@ -5,7 +5,7 @@
 #Spawn boats at random between x=[-4000,4000] and y=[-1000,-4000]
 
 MAX_ROLLANGLE = 0.02
-MAX_PITCHANGLE = 0.08
+MAX_PITCHANGLE = 0.04
 
 UPPER_X = 4000
 UPPER_Y = -1000
@@ -56,10 +56,10 @@ def talker():
         #shipstate.pose.position.y = -882
         #shipstate.pose.position.z = 0
 
-        for i in range(7):
+        for i in range(2):
             shipstate.pose.position.x = ship_pos[2*i]
             shipstate.pose.position.y = ship_pos[(2*i)+1]
-            shipstate.pose.position.z = -2.6
+            shipstate.pose.position.z = 0
             shipstate.model_name = ship_names[i]
             pub.publish(shipstate)
        
@@ -73,19 +73,14 @@ def get_quaternion_from_euler(roll, pitch, yaw):
      return [qx, qy, qz, qw]
 
 
-ship_names = ['vessel_a', 'vessel_b', 'vessel_c', 'vessel_d', 'vessel_e', 'vessel_f', 'vessel_g']
-ship_pos = [rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y), rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y),
-            rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y), rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y),
-            rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y), rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y),
-            rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y), rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y),
-            rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y), rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y),
-            rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y), rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y),
-            rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y), rd.randint(LOWER_X, UPPER_X),rd.randint(LOWER_Y, UPPER_Y)]
+ship_names = ['vessel_g', 'vessel_g_0']
+ship_pos = [-15, 0,
+            15, 0,]
 
 
 rollangle = 0.00
 pitchangle = 0.05
-yawangle = 0.00
+yawangle = 1.57
 shippose = Pose()
 shipstate = ModelState()
 
