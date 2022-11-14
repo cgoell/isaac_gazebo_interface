@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-#Interface between Isaac Sim and Gazebo, streaming the positions from Gazebo to Isaac Sim
 import carb
 from omni.isaac.kit import SimulationApp
 
@@ -36,7 +35,7 @@ from geometry_msgs.msg import Quaternion
 from gazebo_msgs.msg import ModelStates
 
 
-pathtoworld = "omniverse://128.237.74.24/Projects/Champ/Map/Coastline_Map/Map_Robots.usd"
+pathtoworld = "omniverse://128.237.74.24/Projects/Champ/Map/Coastline_Map/Map_Robot.usd"
 omni.usd.get_context().open_stage(pathtoworld, None)
 simulation_app.update()
 print("Loading stage...")
@@ -53,7 +52,7 @@ def getnames(data):
     global hexaindex
     global vtol1index
     global vtol2index
-    flag =1
+    flag = 1
     for j in range(len(data.name)):
         if "hexa_x_tilt" in data.name[j]:
             hexaindex = j
@@ -72,12 +71,15 @@ def callback(data):
     # vc_pose.orientation = data.pose[4].orientation
     # vg_pose.position = data.pose[5].position
     # vg_pose.orientation = data.pose[5].orientation
-    vdrone_pose.position = data.pose[hexaindex].position        #drone UAV  
-    vdrone_pose.orientation = data.pose[hexaindex].orientation
-    vtol1_pose.position = data.pose[vtol1index].position        #drone VTOL1  
-    vtol1_pose.orientation = data.pose[vtol1index].orientation
-    vtol2_pose.position = data.pose[vtol2index].position        #drone VTOL2  
-    vtol2_pose.orientation = data.pose[vtol2index].orientation
+    if hexaindex != 999:
+        vdrone_pose.position = data.pose[hexaindex].position        #drone UAV  
+        vdrone_pose.orientation = data.pose[hexaindex].orientation
+    if vtol1index != 999:
+        vtol1_pose.position = data.pose[vtol1index].position        #drone VTOL1  
+        vtol1_pose.orientation = data.pose[vtol1index].orientation
+    if vtol2index != 999:
+        vtol2_pose.position = data.pose[vtol2index].position        #drone VTOL2  
+        vtol2_pose.orientation = data.pose[vtol2index].orientation
 
 def callback_cam1(data):
     #Implement an offset for the camera of fixed wing 1 here to emulate a gimbal
@@ -134,9 +136,12 @@ def move():
     global headingc1
     global headingc2
     #Streaming positions from gazebo to Isaac Sim
-    vtol1_prim.set_world_pose(position=np.array([vtol1_pose.position.x, vtol1_pose.position.y, vtol1_pose.position.z+0.75]),orientation=np.array([vtol1_pose.orientation.w, vtol1_pose.orientation.x, vtol1_pose.orientation.y, vtol1_pose.orientation.z]))
-    vtol2_prim.set_world_pose(position=np.array([vtol2_pose.position.x, vtol2_pose.position.y, vtol2_pose.position.z+0.75]),orientation=np.array([vtol2_pose.orientation.w, vtol2_pose.orientation.x, vtol2_pose.orientation.y, vtol2_pose.orientation.z]))
-    vdrone_prim.set_world_pose(position=np.array([vdrone_pose.position.x, vdrone_pose.position.y, vdrone_pose.position.z]),orientation=np.array([vdrone_pose.orientation.w, vdrone_pose.orientation.x, vdrone_pose.orientation.y, vdrone_pose.orientation.z]))
+    if vtol1index != 999:
+        vtol1_prim.set_world_pose(position=np.array([vtol1_pose.position.x, vtol1_pose.position.y, vtol1_pose.position.z+0.75]),orientation=np.array([vtol1_pose.orientation.w, vtol1_pose.orientation.x, vtol1_pose.orientation.y, vtol1_pose.orientation.z]))
+    if vtol2index != 999:
+        vtol2_prim.set_world_pose(position=np.array([vtol2_pose.position.x, vtol2_pose.position.y, vtol2_pose.position.z+0.75]),orientation=np.array([vtol2_pose.orientation.w, vtol2_pose.orientation.x, vtol2_pose.orientation.y, vtol2_pose.orientation.z]))
+    if hexaindex != 999:
+        vdrone_prim.set_world_pose(position=np.array([vdrone_pose.position.x, vdrone_pose.position.y, vdrone_pose.position.z]),orientation=np.array([vdrone_pose.orientation.w, vdrone_pose.orientation.x, vdrone_pose.orientation.y, vdrone_pose.orientation.z]))
     # vc_prim.set_world_pose(position=np.array([vc_pose.position.x, vc_pose.position.y, vc_pose.position.z]),orientation=get_quaternion_from_euler(vc_pose.orientation.x, vc_pose.orientation.y, vc_pose.orientation.z))
     # vg_prim.set_world_pose(position=np.array([vg_pose.position.x, vg_pose.position.y, vg_pose.position.z]),orientation=get_quaternion_from_euler(vg_pose.orientation.x, vg_pose.orientation.y, vg_pose.orientation.z))
     
@@ -161,12 +166,16 @@ def move():
         cam1frontarray[2]=math.pi
     else: 
         cam1frontarray[1]=((360.0-headingc1)/180.0)*math.pi
+    #auxarray1 = get_quaternion_from_euler(cam1frontarray[0], cam1frontarray[1], cam1frontarray[2])
+    #auxarray2 =  euler_from_quaternion(auxarray1[1],auxarray1[2],auxarray1[3],auxarray1[0])
     auxarray2=cam1frontarray
     auxarray2[0]+=camoffset1[0]
     auxarray2[1]+=camoffset1[1]
     auxarray2[2]+=camoffset1[2]
+    #print(auxarray2)
     auxarray1=get_quaternion_from_euler(auxarray2[0],auxarray2[1],auxarray2[2])
     auxarray1[3]=-auxarray1[3]
+    #print(auxarray1)
     vcamera1front_prim.set_world_pose(position=np.array([vtol1_pose.position.x, vtol1_pose.position.y, vtol1_pose.position.z]),orientation=auxarray1)
     #Fixed Wing 2
     cam2frontarray[0]= 0.5*math.pi  
@@ -180,6 +189,8 @@ def move():
         cam2frontarray[2]=math.pi
     else: 
         cam2frontarray[1]=((360.0-headingc2)/180.0)*math.pi
+    #auxarray1 = get_quaternion_from_euler(cam2frontarray[0], cam2frontarray[1], cam2frontarray[2])
+    #auxarray2 =  euler_from_quaternion(auxarray1[1],auxarray1[2],auxarray1[3],auxarray1[0])
     auxarray2 = cam2frontarray
     auxarray2[0]+=camoffset2[0]
     auxarray2[1]+=camoffset2[1]
@@ -199,9 +210,9 @@ def listener():
 
 #defining global variables
 flag =0
-hexaindex=0
-vtol1index=0
-vtol2index=0
+hexaindex=999
+vtol1index=999
+vtol2index=999
 cam1frontarray=np.zeros(3,dtype=float)
 cam2frontarray=np.zeros(3,dtype=float)
 camoffset1 = np.zeros(3,dtype=float)
