@@ -118,7 +118,7 @@ def image_callback(msg):
 def imu_callback(msg):
     global angvel,linacc
     angvel = msg.angular_velocity
-    linvel = msg.linear_acceleration
+    linacc = msg.linear_acceleration
 
 def move():
     global cam1frontarray
